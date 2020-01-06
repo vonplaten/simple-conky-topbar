@@ -1,0 +1,109 @@
+conky.config = {
+	background = true,
+	use_xft = true,
+	font = 'Fantasque Sans Mono:Regular:size=11',
+	xftalpha = 1.0,
+	update_interval = 5,
+	total_run_times = 0,
+
+	own_window = true,
+	own_window_colour = '#070707',
+	own_window_transparent = false,
+	own_window_type = 'panel',	
+	own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+	own_window_class = 'ConkyXfc4',
+	own_window_title = 'ConkyXfce4',
+
+	own_window_argb_visual = true,
+	own_window_argb_value = 160,
+
+	no_buffers = true,
+	uppercase = true,
+	cpu_avg_samples = 2,
+	override_utf8_locale = true,
+	short_units = true,
+	imlib_cache_size = 0,
+	pad_percents = 1,
+	-- max_specials = '2048',
+	max_user_text = 3200,
+	text_buffer_size = 1024,
+	no_buffers = true,
+	if_up_strictness = 'address',
+	double_buffer = true,
+	minimum_width = 1366, minimum_height = 0,
+	maximum_width = 1366,
+	draw_shades = false,
+	draw_outline = false,
+	draw_borders = false,
+	draw_graph_borders = false,
+	border_inner_margin = 1,
+	border_outer_margin = 1,
+
+	default_color = '#DAC79C',
+	default_shade_color = '#000000',
+	default_outline_color = '#828282',
+	color0 = '#FFFFFF',
+	color1 = '#000000',
+	color2 = '#FF0000',-- - red
+	color3 = '#FFFF00',-- - yellow
+	color4 = '#0000FF',-- - blue
+	color5 = '#00FF00',-- - green
+	color6 = '#FFA500',-- - orange
+	color7 = '#00CDCD',-- - cyan3
+	color8 = '#FFD700',-- - gold
+	color9 = '#F00F16',-- - reddish
+
+	alignment = 'top_middle',
+	gap_x = 0,
+	gap_y = 0,
+};
+
+
+conky.text = [[
+${goto 64}\
+CPU:${offset 8}\
+${if_match ${cpu}<=50}${color5}${else}\
+${if_match ${cpu}<=70}${color8}${else}\
+${if_match ${cpu}>70}${color9}${endif}${endif}${endif}\
+${cpu cpu0}%${color}${offset 16}\
+\
+${if_match ${hwmon 1 temp 7}<=50}${color5}${else}\
+${if_match ${hwmon 1 temp 7}<=70}${color8}${else}\
+${if_match ${hwmon 1 temp 7}>70}${color9}${endif}${endif}${endif}\
+${hwmon 1 temp 7}${offset 2}${color}°C${offset 64}\
+\
+GPU:${offset 8}\
+${if_match ${exec nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader}<=40}${color5}${else}\
+${if_match ${exec nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader}<=60}${color8}${else}\
+${if_match ${exec nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader}>60}${color9}${endif}${endif}${endif}\
+${exec nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader}${offset 16}\
+\
+${exec nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader}${offset 2}°C${color}${offset 16}\
+\
+${if_match ${exec nvidia-smi --query-gpu=memory.used --format=csv,noheader | cut -d' ' -f 1}<=7000}${color5}${else}\
+${if_match ${exec nvidia-smi --query-gpu=memory.used --format=csv,noheader | cut -d' ' -f 1}<=9000}${color8}${else}\
+${if_match ${exec nvidia-smi --query-gpu=memory.used --format=csv,noheader | cut -d' ' -f 1}>9000}${color9}${endif}${endif}${endif}\
+${exec echo $(nvidia-smi --query-gpu=memory.used --format=csv,noheader | cut -d' ' -f 1)/1000 | bc -l | awk '{printf "%.2f", $1}'}/${exec echo $(nvidia-smi --query-gpu=memory.total --format=csv,noheader | cut -d' ' -f 1)/1000 | bc -l | awk '{printf "%.2f", $1}'}${color}G${offset 64}\
+\
+GPU-${color0}${exec nvidia-settings -query [fan:0]/GPUCurrentFanSpeedRPM -t}${color},${offset 8}\
+BA-${color0}${hwmon 1 fan 1 input}${color},${offset 8}\
+T-${color0}${hwmon 1 fan 2 input}${color},${offset 8}\
+FU-${color0}${hwmon 1 fan 6 input}${color},${offset 8}\
+FD-${color0}${hwmon 1 fan 3 input}${color},${offset 8}\
+BO-${color0}${hwmon 1 fan 4 input}${color},${offset 8}\
+P-${color0}${hwmon 1 fan 5 input}${color}${offset 8}\
+${offset 64}\
+\
+MEM:${offset 8}\
+${if_match ${exec free -m | awk 'NR==2{printf "%.2f", $3/1000 }'}<=8}${color5}${else}\
+${if_match ${exec free -m | awk 'NR==2{printf "%.2f", $3/1000 }'}<=12}${color8}${else}\
+${if_match ${exec free -m | awk 'NR==2{printf "%.2f", $3/1000 }'}>12}${color9}${endif}${endif}${endif}\
+${membar 10,60}${offset 8}${exec free -m | awk 'NR==2{printf "%.2f", $3/1000 }'}G${color}${offset 16}\
+\
+DISK:${offset 8}\
+${if_match ${exec df -h | awk '$NF=="/"{printf substr($5,1,length($5)-1), $5}'}<=70}${color5}${else}\
+${if_match ${exec df -h | awk '$NF=="/"{printf substr($5,1,length($5)-1), $5}'}<=100}${color8}${else}\
+${if_match ${exec df -h | awk '$NF=="/"{printf substr($5,1,length($5)-1), $5}'}>100}${color9}${endif}${endif}${endif}\
+${exec df -h | awk '$NF=="/"{printf substr($3,1,length($3)-1), $3}'}/${exec df -h | awk '$NF=="/"{printf substr($2,1,length($2)-1), $2}'}G${color}${offset 64}\
+
+]];
